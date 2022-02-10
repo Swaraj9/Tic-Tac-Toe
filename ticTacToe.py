@@ -1,4 +1,4 @@
-from distutils import command
+import time
 from tkinter import *
 from tkinter import ttk
 
@@ -15,11 +15,12 @@ imageX = PhotoImage(file='./X.png').subsample(3, 3)
 imageEmpty = PhotoImage(file='./Empty.png').subsample(3, 3)
 
 currentPlayer = StringVar()
-currentPlayer.set('Player 1')
+currentPlayer.set('Player 1 (O)')
 
 # Player Label
-playerLabel = ttk.Label(frame, textvariable=currentPlayer, font=('Arial', 25),
-                        padding=(0, 0, 0, 10)).grid(column=1, row=0)
+playerLabel = ttk.Label(frame, textvariable=currentPlayer,
+                        font=('Arial', 20), padding=(0, 0, 0, 10))
+playerLabel.grid(column=1, row=0)
 
 
 # Game Button Behaviour
@@ -33,18 +34,17 @@ class gameButton:
 
     def onClick(self):
         global currentPlayer
-        global playerLabel
 
-        if(currentPlayer.get() == 'Player 1'):
+        if(currentPlayer.get() == 'Player 1 (O)'):
             if(self.state == 'empty'):
                 self.button.config(image=imageO)
                 self.state = 'o'
-                currentPlayer.set('Player 2')
+                currentPlayer.set('Player 2 (X)')
         else:
             if(self.state == 'empty'):
                 self.button.config(image=imageX)
                 self.state = 'x'
-                currentPlayer.set('Player 1')
+                currentPlayer.set('Player 1 (O)')
 
         checkWinCondition()
 
@@ -97,7 +97,7 @@ buttons = (b1, b2, b3, b4, b5, b6, b7, b8, b9)
 
 # Reset Game
 def reset():
-    currentPlayer.set('Player 1')
+    currentPlayer.set('Player 1 (O)')
     for button in buttons:
         button.setState('empty')
         button.getButton().config(image=imageEmpty)
@@ -107,7 +107,18 @@ resetButton = ttk.Button(frame, text='Reset', command=reset).grid(
     column=1, row=4, pady=10)
 
 
+def victory():
+    if(currentPlayer.get() == 'Player 1 (O)'):
+        currentPlayer.set('Player 2 (X) Wins')
+    else:
+        currentPlayer.set('Player 1 (O) Wins')
+
+    root.after(2000, reset)
+
+
 # Checking Victory Conditions
+
+
 def checkWinCondition():
     for i in range(0, len(buttons)):
         buttonState = buttons[i].getState()
@@ -116,25 +127,25 @@ def checkWinCondition():
         if(i in (1, 4, 7)):
             if(0 <= i-1 < len(buttons) and 0 <= i+1 < len(buttons) and buttonState != 'empty'):
                 if(buttons[i-1].getState() == buttonState and buttons[i+1].getState() == buttonState):
-                    print('V Victory', i)
+                    victory()
 
         # Diagonal Victory 2
         if(i == 4):
             if(0 <= i-2 < len(buttons) and 0 <= i+2 < len(buttons) and buttonState != 'empty'):
                 if(buttons[i-2].getState() == buttonState and buttons[i+2].getState() == buttonState):
-                    print('D2 Victory', i)
+                    victory()
 
         # Horizontal Victory
         if(i in (3, 4, 5)):
             if(0 <= i-3 < len(buttons) and 0 <= i+3 < len(buttons) and buttonState != 'empty'):
                 if(buttons[i-3].getState() == buttonState and buttons[i+3].getState() == buttonState):
-                    print('H Victory', i)
+                    victory()
 
         # Diagonal Victory 1
         if(i == 4):
             if(0 <= i-4 < len(buttons) and 0 <= i+4 < len(buttons) and buttonState != 'empty'):
                 if(buttons[i-4].getState() == buttonState and buttons[i+4].getState() == buttonState):
-                    print('D1 Victory', i)
+                    victory()
 
 
 # Running Game Loop
